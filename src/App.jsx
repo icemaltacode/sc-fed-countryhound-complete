@@ -30,8 +30,8 @@ function CountryCard({ country, expandHandler }) {
             <td>{country.nativeName}</td>
           </tr>
           <tr>
-            <th scope="row">Country Codes</th>
-            <td>{country.cca2} / {country.cca3}</td>
+            <th scope="row">Country Code</th>
+            <td>{country.cca3}</td>
           </tr>
           <tr>
             <th scope="row">Currencies</th>
@@ -68,8 +68,8 @@ function ExpandedCard({ country, expandHandler }) {
                       <td>{country.nativeName}</td>
                     </tr>
                     <tr>
-                      <th scope="row">Country Codes</th>
-                      <td>{country.cca2} / {country.cca3}</td>
+                      <th scope="row">Country Code</th>
+                      <td>{country.cca3}</td>
                     </tr>
                     <tr>
                       <th scope="row">Currencies</th>
@@ -91,10 +91,6 @@ function ExpandedCard({ country, expandHandler }) {
                       <th scope="row">Population</th>
                       <td>{country.population}</td>
                     </tr>
-                    <tr>
-                      <th scope="row">Lat/Lng</th>
-                      <td>{country.coordinates[0]},{country.coordinates[1]}</td>
-                    </tr>
                     </tbody>
                   </table>
               </div>
@@ -115,21 +111,19 @@ function CardContainer({ query, expandHandler }) {
   useEffect(() => setSearchTerm(query), [query])
 
   useEffect(() => {
-    const endPoint = searchTerm === "" ? "all" : `name/${searchTerm}`;
+    const endPoint = searchTerm === "" ? "all?fields=name,cca3,currencies,region,subregion,languages,population,timezones,flags,flag" : `name/${searchTerm}`;
     fetch(`https://restcountries.com/v3.1/${endPoint}`)
       .then((res) => res.json())
       .then((data) => setCountries(data.map((country) => {
           return {
             name: country.name.common,
             officialName: country.name.official,
-            nativeName: country.name.nativeName ? country.name.nativeName[Object.keys(country.name.nativeName)[0]].common : "--",
-            cca2: country.cca2,
+            nativeName: country.name.nativeName[Object.keys(country.name.nativeName)] ? country.name.nativeName[Object.keys(country.name.nativeName)[0]].common : "--",
             cca3: country.cca3,
             currencies: country.currencies ? Object.keys(country.currencies).toString() : "--",
             region: country.region,
             subRegion: country.subregion,
             languages: country.languages ? Object.values(country.languages).join(', ') : "--",
-            coordinates: country.latlng,
             population: country.population.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
             timeZones: Object.keys(country.timezones).toString(),
             flag: country.flags.svg,
